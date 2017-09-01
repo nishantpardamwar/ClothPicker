@@ -1,15 +1,17 @@
 package nishant.clothpicker.utils.login_helper;
 
+import nishant.clothpicker.model.User;
+
 /**
  * Created by serious on 1/9/17.
  */
 
 public interface LoginInterface {
-    void onAlreadyLoggedIn();
+    void onAlreadyLoggedIn(String via, User user, boolean loggedIn);
 
-    void onLoginSuccess();
+    void onLoginSuccess(String via, User user);
 
-    void onLoginFailure();
+    void onLoginFailure(String via);
 
-    void onCancel();
+    void onCancel(String via);
 }

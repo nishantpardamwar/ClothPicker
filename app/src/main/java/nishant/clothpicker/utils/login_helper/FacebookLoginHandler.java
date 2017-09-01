@@ -12,7 +12,10 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import nishant.clothpicker.model.User;
 
 /**
  * Created by serious on 1/9/17.
@@ -33,17 +36,27 @@ public class FacebookLoginHandler {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                loginInterface.onLoginSuccess();
+                GraphRequest.newMeRequest(loginResult.getAccessToken(), (object, response) -> {
+                    try {
+                        User user = new User.Builder()
+                                .name(object.isNull("name") ? "" : object.getString("name"))
+                                .email(object.isNull("email") ? "" : object.getString("name"))
+                                .build();
+                        loginInterface.onLoginSuccess(LoginHandler.VIA_FACEBOOK, user);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }).executeAsync();
             }
 
             @Override
             public void onCancel() {
-                loginInterface.onCancel();
+                loginInterface.onCancel(LoginHandler.VIA_FACEBOOK);
             }
 
             @Override
             public void onError(FacebookException error) {
-                loginInterface.onLoginFailure();
+                loginInterface.onLoginFailure(LoginHandler.VIA_FACEBOOK);
             }
         });
     }
@@ -52,12 +65,22 @@ public class FacebookLoginHandler {
     public void isAlreadyLoggedIn() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null && !accessToken.isExpired()) {
-            GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+            GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
                 @Override
                 public void onCompleted(JSONObject object, GraphResponse response) {
-                    loginInterface.onAlreadyLoggedIn();
+                    try {
+                        User user = new User.Builder()
+                                .name(object.isNull("name") ? "" : object.getString("name"))
+                                .email(object.isNull("email") ? "" : object.getString("name"))
+                                .build();
+                        loginInterface.onAlreadyLoggedIn(LoginHandler.VIA_FACEBOOK, user, true);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            });
+            }).executeAsync();
+        } else {
+            loginInterface.onAlreadyLoggedIn(LoginHandler.VIA_FACEBOOK, null, false);
         }
     }
 

@@ -11,12 +11,14 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 
+import nishant.clothpicker.model.User;
+
 /**
  * Created by serious on 2/9/17.
  */
 
 public class GoogleLoginHandler {
-    private static final int RC_SIGN_IN = 50;
+    public static final int RC_SIGN_IN = 50;
     private FragmentActivity fragmentActivity;
     private GoogleApiClient mGoogleApiClient;
     private SignInButton signInButton;
@@ -44,13 +46,16 @@ public class GoogleLoginHandler {
         fragmentActivity.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
+    public void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            loginInterface.onLoginSuccess();
+            User user = new User.Builder()
+                    .name(acct.getDisplayName())
+                    .email(acct.getEmail()).build();
+            loginInterface.onLoginSuccess(LoginHandler.VIA_GOOGLE, user);
         } else {
-            loginInterface.onLoginFailure();
+            loginInterface.onLoginFailure(LoginHandler.VIA_GOOGLE);
         }
     }
 
@@ -61,14 +66,26 @@ public class GoogleLoginHandler {
             // and the GoogleSignInResult will be available instantly.
             GoogleSignInResult result = opr.get();
             //handleSignInResult(result);
-            loginInterface.onAlreadyLoggedIn();
+            GoogleSignInAccount acct = result.getSignInAccount();
+            User user = new User.Builder()
+                    .name(acct.getDisplayName())
+                    .email(acct.getEmail()).build();
+            loginInterface.onAlreadyLoggedIn(LoginHandler.VIA_GOOGLE, user, true);
         } else {
             // If the user has not previously signed in on this device or the sign-in has expired,
             // this asynchronous branch will attempt to sign in the user silently.  Cross-device
             // single sign-on will occur in this branch.
             opr.setResultCallback(googleSignInResult -> {
                 //handleSignInResult(googleSignInResult);
-                loginInterface.onAlreadyLoggedIn();
+                if (googleSignInResult.isSuccess()) {
+                    GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
+                    User user = new User.Builder()
+                            .name(acct.getDisplayName())
+                            .email(acct.getEmail()).build();
+                    loginInterface.onAlreadyLoggedIn(LoginHandler.VIA_GOOGLE, user, true);
+                } else {
+                    loginInterface.onAlreadyLoggedIn(LoginHandler.VIA_GOOGLE, null, false);
+                }
             });
         }
     }

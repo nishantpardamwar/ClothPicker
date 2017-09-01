@@ -1,16 +1,22 @@
 package nishant.clothpicker.utils.login_helper;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
-import com.facebook.CallbackManager;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
+
+import nishant.clothpicker.model.User;
 
 /**
  * Created by serious on 2/9/17.
  */
 
 public class LoginHandler implements LoginInterface {
+    public static final String VIA_GOOGLE = "google";
+    public static final String VIA_FACEBOOK = "fb";
     private FragmentActivity fragmentActivity;
     private SignInButton signInButton;
     private LoginButton loginButton;
@@ -27,28 +33,38 @@ public class LoginHandler implements LoginInterface {
         googleHandler = new GoogleLoginHandler(fragmentActivity, signInButton, this);
     }
 
-    @Override
-    public void onAlreadyLoggedIn() {
-        loginInterface.onAlreadyLoggedIn();
+    public void checkAlreadyLogged() {
+        fbHandler.isAlreadyLoggedIn();
+        googleHandler.isAlreadyLoggedIn();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == GoogleLoginHandler.RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            googleHandler.handleSignInResult(result);
+        } else {
+            fbHandler.getCallbackManager().onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
-    public void onLoginSuccess() {
-        loginInterface.onLoginSuccess();
+    public void onAlreadyLoggedIn(String via, User user, boolean loggedIn) {
+        loginInterface.onAlreadyLoggedIn(via, user, loggedIn);
     }
 
     @Override
-    public void onLoginFailure() {
-        loginInterface.onLoginFailure();
+    public void onLoginSuccess(String via, User user) {
+        loginInterface.onLoginSuccess(via, user);
     }
 
     @Override
-    public void onCancel() {
-        loginInterface.onCancel();
+    public void onLoginFailure(String via) {
+        loginInterface.onLoginFailure(via);
     }
 
-    public CallbackManager getFBCallBackManager() {
-        return fbHandler.getCallbackManager();
+    @Override
+    public void onCancel(String via) {
+        loginInterface.onCancel(via);
     }
 
     public static final class Builder {
@@ -61,17 +77,17 @@ public class LoginHandler implements LoginInterface {
             this.fragmentActivity = fragmentActivity;
         }
 
-        public Builder signInButton(SignInButton val) {
+        public Builder googleLoginButton(SignInButton val) {
             signInButton = val;
             return this;
         }
 
-        public Builder loginButton(LoginButton val) {
+        public Builder fbLoginButton(LoginButton val) {
             loginButton = val;
             return this;
         }
 
-        private Builder loginInterface(LoginInterface val) {
+        public Builder loginInterface(LoginInterface val) {
             loginInterface = val;
             return this;
         }
