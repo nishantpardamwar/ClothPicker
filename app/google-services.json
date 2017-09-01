@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "906646697263",
+    "project_id": "clothpicker-eb511"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906646697263:android:2a5e10a619e3c7df",
+        "android_client_info": {
+          "package_name": "nishant.clothpicker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906646697263-pn2aq2k60njqj0177gr7vrk1jp2tdl8f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "nishant.clothpicker",
+            "certificate_hash": "ef18d71d24a619bb5e1509acface37b42b96b19a"
+          }
+        },
+        {
+          "client_id": "906646697263-5kl6061nh2aejqmpdhf80shous54a2je.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkJ0wSt4dtYUGLAJ_sv1LEAWTPQO0E3jo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

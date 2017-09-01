@@ -1,7 +1,9 @@
-package nishant.clothpicker;
+package nishant.clothpicker.ui.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import nishant.clothpicker.R;
 
 public class MainActivity extends AppCompatActivity {
 
